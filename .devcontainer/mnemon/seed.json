@@ -626,6 +626,30 @@
         "codespace"
       ],
       "source": "agent"
+    },
+    {
+      "content": "HARD RULE: Always use the repo's `tdd` skill (.devcontainer/skills/tdd) for test-driven development — NEVER the stock Hermes `test-driven-development` skill. The repo tdd skill is the Hermes-adapted superpowers version + mattpocock's seam-confirmation and tautological-test checks, persisted and versioned. It is the single source of truth for TDD.",
+      "category": "decision",
+      "importance": 5,
+      "tags": ["skill", "tdd", "test-driven-development", "hard-rule"],
+      "entities": ["tdd", "test-driven-development", ".devcontainer/skills/tdd", "TDD"],
+      "source": "agent"
+    },
+    {
+      "content": "Skill: grill-with-docs (.devcontainer/skills/grill-with-docs + references/CONTEXT-FORMAT.md + references/ADR-FORMAT.md). Merges mattpocock's grill-with-docs and domain-modeling. Behavior: relentless interview to sharpen a plan/design while writing a domain glossary (CONTEXT.md) and ADRs as we go. Sections: interview mode, challenge against glossary, sharpen fuzzy language, edge-case scenarios, cross-reference code, update CONTEXT.md inline, offer ADRs sparingly. CONTEXT.md is a glossary and nothing else; an ADR needs ALL of: hard to reverse, surprising without context, real trade-off.",
+      "category": "fact",
+      "importance": 4,
+      "tags": ["skill", "grill-with-docs", "domain-modeling", "ADR"],
+      "entities": ["grill-with-docs", ".devcontainer/skills/grill-with-docs", "CONTEXT.md", "ADR", "domain-modeling"],
+      "source": "agent"
+    },
+    {
+      "content": "The stock Hermes `test-driven-development` skill (~/.hermes/skills/software-development/) is superseded by the repo `tdd` skill. Do not load or prefer it; use tdd. It is not git-tracked and is an obsolete copy (kept for now, not deleted).",
+      "category": "fact",
+      "importance": 4,
+      "tags": ["skill", "tdd", "obsolete", "superseded"],
+      "entities": ["test-driven-development", "tdd", "~/.hermes/skills/software-development"],
+      "source": "agent"
     }
   ]
 }
