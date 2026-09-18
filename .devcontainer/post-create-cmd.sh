@@ -2,7 +2,7 @@
 
 HERMES_VERSION="v2026.9.14"
 OMNIROUTE_VERSION=3.8.50
-MODELRELAY_VERSION=1.22.1
+9ROUTER_VERSION=0.5.81
 MNEMON_VERSION=0.2.8
 PI_AGENT_VERSION=0.85.1
 HERDR_VERSION=0.7.4
@@ -113,17 +113,17 @@ if command -v hermes &>/dev/null && [ -d "$HOME/.hermes/sessions" ] && [ -z "$(l
   hermes config set model.provider omniroute
   hermes config set providers.omniroute.base_url http://localhost:20128/v1
   hermes config set providers.omniroute.api_key no-key-needed
-  hermes config set providers.modelrelay.base_url http://localhost:7352/v1
-  hermes config set providers.modelrelay.api_key no-key-needed
-  hermes config set fallback_providers.provider modelrelay
+  hermes config set providers.9router.base_url http://localhost:7352/v1
+  hermes config set providers.9router.api_key no-key-needed
+  hermes config set fallback_providers.provider 9router
   hermes config set fallback_providers.model auto-fastest
 
   hermes config set auxiliary.title_generation.model auto-fastest
-  hermes config set auxiliary.title_generation.provider modelrelay
+  hermes config set auxiliary.title_generation.provider 9router
   hermes config set auxiliary.vision.model auto-fastest
-  hermes config set auxiliary.vision.provider modelrelay
+  hermes config set auxiliary.vision.provider 9router
   hermes config set auxiliary.compression.model auto-fastest
-  hermes config set auxiliary.compression.provider modelrelay
+  hermes config set auxiliary.compression.provider 9router
 
   # Turn off approval alert and live dangerously since u are in a self-contained container.
   hermes config set approvals.mode off
@@ -145,22 +145,40 @@ if command -v hermes &>/dev/null && [ -d "$HOME/.hermes/sessions" ] && [ -z "$(l
 
 fi
 
-# Install modelrelay globally
-sudo npm install -g modelrelay@${MODELRELAY_VERSION} --prefix /usr/local/lib/modelrelay
-sudo ln -sf /usr/local/lib/modelrelay/bin/modelrelay /usr/local/bin/modelrelay
+# Install 9router globally
+sudo npm install -g 9router@v${9ROUTER_VERSION} --prefix /usr/local/lib/9router
+sudo ln -sf /usr/local/lib/9router/bin/9router /usr/local/bin/9router
 sudo npm cache clean --force
 
-echo "[$SCRIPT_NAME] Checking modelrelay..."
-if command -v modelrelay &>/dev/null; then
-  if pgrep -f modelrelay > /dev/null; then
-    echo "[$SCRIPT_NAME] modelrelay is already running, skipping"
+echo "[$SCRIPT_NAME] Checking 9router..."
+if command -v 9router &>/dev/null; then
+  if pgrep -f 9router > /dev/null; then
+    echo "[$SCRIPT_NAME] 9router is already running, skipping"
   else
-    echo "[$SCRIPT_NAME] Starting modelrelay in the background..."
-    modelrelay --disable
-    setsid /usr/local/bin/modelrelay >> /tmp/modelrelay.log 2>&1 &
+    echo "[$SCRIPT_NAME] Starting 9router in the background..."
+    nohup /usr/local/bin/9router --host 0.0.0.0 --host 127.0.0.1 --port 7352 --no-browser --skip-update >> /tmp/9router.log 2>&1 &
   fi
 else
-  echo "[$SCRIPT_NAME] modelrelay not found, skipping start"
+  echo "[$SCRIPT_NAME] 9router not found, skipping start"
+fi
+
+# Wait for 9router to be ready, then run its config script
+if command -v 9router &>/dev/null; then
+  echo "[$SCRIPT_NAME] Waiting for 9router to be ready..."
+  MAX_ATTEMPTS=300
+  for ((attempt=1; attempt<=MAX_ATTEMPTS; attempt++)); do
+    if curl -s --max-time 3 -o /dev/null http://localhost:7352/api/health; then
+      break
+    fi
+    if [ "$attempt" -eq "$MAX_ATTEMPTS" ]; then
+      echo "[$SCRIPT_NAME] Error: 9router failed to start after $MAX_ATTEMPTS attempts."
+      exit 1
+    fi
+    sleep 1
+  done
+  echo "[$SCRIPT_NAME] Configuring 9router..."
+  bash "$SCRIPT_DIR/9router-config.sh"
+  echo "[$SCRIPT_NAME] 9router configuration complete!"
 fi
 
 # Install OmniRoute and start automatically when desktop loads
