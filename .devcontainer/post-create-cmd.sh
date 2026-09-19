@@ -2,7 +2,7 @@
 
 HERMES_VERSION="v2026.9.14"
 OMNIROUTE_VERSION=3.8.50
-9ROUTER_VERSION=0.5.81
+NINE_ROUTER_VERSION=0.5.81
 MNEMON_VERSION=0.2.8
 PI_AGENT_VERSION=0.85.1
 HERDR_VERSION=0.7.4
@@ -146,7 +146,7 @@ if command -v hermes &>/dev/null && [ -d "$HOME/.hermes/sessions" ] && [ -z "$(l
 fi
 
 # Install 9router globally
-sudo npm install -g 9router@v${9ROUTER_VERSION} --prefix /usr/local/lib/9router
+sudo npm install -g 9router@v${NINE_ROUTER_VERSION} --prefix /usr/local/lib/9router
 sudo ln -sf /usr/local/lib/9router/bin/9router /usr/local/bin/9router
 sudo npm cache clean --force
 
