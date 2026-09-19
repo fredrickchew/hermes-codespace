@@ -18,7 +18,7 @@ by whether a **client connection ("consumer")** is attached and sending activity
 
 - A connected editor that you use (typing/scrolling) and terminal input **or
   output** resets the idle timer.
-- Headless services inside the container (web servers, ollama, model relay, an
+- Headless services inside the container (web servers, ollama, 9router, an
   agent daemon) do **NOT** keep the codespace alive on their own.
 - Closing the editor tab / walking away drops the client connection and starts
   the idle countdown.

@@ -295,7 +295,7 @@
       "source": "agent"
     },
     {
-      "content": "Refactored start-hermes.sh with unified dependency validation: single loop checks 5 binaries (modelrelay, omniroute, ollama, hermes, mnemon) + skills directory + seed.json. Fails fast with FATAL message listing all missing items. Simplified service sections to use pgrep only.",
+      "content": "Refactored start-hermes.sh with unified dependency validation: single loop checks 5 binaries (9router, omniroute, ollama, hermes, mnemon) + skills directory + seed.json. Fails fast with FATAL message listing all missing items. Simplified service sections to use pgrep only.",
       "category": "decision",
       "importance": 4,
       "tags": [

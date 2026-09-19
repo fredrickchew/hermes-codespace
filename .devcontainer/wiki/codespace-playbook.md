@@ -419,7 +419,7 @@ The CI pipeline (`devcontainer-ci.yml`) runs on PRs and pushes to main:
 - Hermes Agent: `v2026.7.20`
 - OmniRoute: `3.8.49`
 - Ollama: `0.32.5`
-- ModelRelay: `1.18.0`
+- 9Router: `0.5.81`
 - Node: `24.18.0`
 - Mnemon: `0.1.17`
 
