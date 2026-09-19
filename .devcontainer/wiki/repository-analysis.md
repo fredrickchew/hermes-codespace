@@ -14,13 +14,13 @@
 |-----------|---------|------|
 | **Hermes Agent** | AI coding agent with memory, skills, multi-step tasks | 9119 (gateway+dashboard) |
 | **OmniRoute** | Primary LLM router — 8 free models, auto-routing | 20128 |
-| **ModelRelay** | Fallback LLM router | 7352 |
+| **9Router** | Fallback LLM router | 7352 |
 | **Ollama** | Local embeddings (nomic-embed-text) for Mnemon | 11434 |
 | **Mnemon** | Persistent graph memory (no token limits, cross-session) | — |
 | **Claude Code** | Anthropic CLI agent (preconfigured to use OmniRoute) | — |
 | **Cline** | VS Code coding agent (preconfigured to use OmniRoute) | — |
 
-The core idea: **free LLM models forever** via OmniRoute/ModelRelay, with **persistent memory** via Mnemon, all inside GitHub Codespaces (free tier: 60 hrs/month).
+The core idea: **free LLM models forever** via OmniRoute/9Router, with **persistent memory** via Mnemon, all inside GitHub Codespaces (free tier: 60 hrs/month).
 
 ---
 
@@ -37,11 +37,11 @@ The core idea: **free LLM models forever** via OmniRoute/ModelRelay, with **pers
 ├─────────────────────────────────────────────────────────────────┤
 │  Terminal Agents                                                │
 │  ├─ hermes (CLI + Gateway :9119 + Dashboard :9119)              │
-│  └─ claude (CLI via ModelRelay/OmniRoute)                       │
+│  └─ claude (CLI via 9Router/OmniRoute)                          │
 ├─────────────────────────────────────────────────────────────────┤
 │  Model Routers (OpenAI-compatible)                              │
 │  ├─ OmniRoute  :20128  → 8 free models (auto-fastest combo)    │
-│  ├─ ModelRelay :7352   → fallback router                        │
+│  ├─ 9Router    :7352   → fallback router                        │
 │  └─ Ollama     :11434  → local embeddings (nomic-embed-text)   │
 ├─────────────────────────────────────────────────────────────────┤
 │  Memory Layer                                                   │
@@ -64,10 +64,10 @@ Script: `.devcontainer/post-create-cmd.sh` (319 lines)
 | 1 | System deps | `apt-get install zsh ripgrep` |
 | 2 | Ollama | Install binary, start `ollama serve`, pull `nomic-embed-text` (async) |
 | 3 | Hermes Agent | Install from NousResearch/hermes-agent (v2026.7.20), ACP protocol |
-| 4 | Hermes config | First-run only: set model=auto-fastest, provider=omniroute, fallback=modelrelay, memory=mnemon, approvals=off, max_turns=120 |
+| 4 | Hermes config | First-run only: set model=auto-fastest, provider=omniroute, fallback=9router, memory=mnemon, approvals=off, max_turns=120 |
 | 5 | Skills | Copy `skill-memory-automation.md` → `~/.hermes/skills/memory-automation/SKILL.md` |
 | 6 | User memory | Copy `.hermes.md` → `~/.hermes.md` (Mnemon instructions) |
-| 7 | ModelRelay | Install from github:gitricko/modelrelay, start on :7352 |
+| 7 | 9Router | Install from github:decolua/9router, start on :7352 |
 | 8 | OmniRoute | Install (v3.8.49), **repair hollow dist deps**, start on :20128 |
 | 9 | Tailscale | Install VPN (not used post-install) |
 | 10 | Mnemon | Download binary from GitHub releases (v0.1.17) |
@@ -95,7 +95,7 @@ Disk reclamation — safe to re-run (idempotent). Removes:
 
 #### b) `.devcontainer/start-hermes.sh` (122 lines)
 Service startup orchestrator:
-1. Start ModelRelay (if not running)
+1. Start 9Router (if not running)
 2. Start OmniRoute (if not running)
 3. Start Ollama + pull nomic-embed-text (if not running)
 4. Install Telegram bot dependency (python-telegram-bot)
@@ -204,7 +204,7 @@ jobs:
 - Service startup failures
 - Configuration errors
 - Missing dependencies
-- OmniRoute/ModelRelay/Ollama integration issues
+- OmniRoute/9Router/Ollama integration issues
 
 **Additional CI checks** (auto-configured by GitHub):
 - **CodeQL**: Security analysis
@@ -237,7 +237,7 @@ cat /tmp/health-report.json | python3 -m json.tool
 |-----------|------------------|--------|
 | Hermes Agent | post-create, start-hermes, CI, config | Active — primary agent |
 | OmniRoute | post-create, start-hermes, CI, config | Active — primary LLM router |
-| ModelRelay | post-create, start-hermes, CI, config | Active — fallback router |
+| 9Router | post-create, start-hermes, CI, config | Active — fallback router |
 | Ollama | post-create, start-hermes, self-check | Active — embeddings for Mnemon |
 | Mnemon | post-create, start-hermes, self-check, skill | Active — persistent memory |
 | Claude Code | post-create, devcontainer.json | Active — secondary agent |
@@ -342,7 +342,7 @@ cat /tmp/health-report.json | python3 -c "import json,sys; d=json.load(sys.stdin
 - Service startup failures
 - Configuration errors
 - Missing dependencies
-- OmniRoute/ModelRelay/Ollama integration breakage
+- OmniRoute/9Router/Ollama integration breakage
 - Health check failures (ports, models, disk, memory)
 
 ### Updating Versions
@@ -351,7 +351,7 @@ Edit the version variables at the top of `post-create-cmd.sh`:
 ```bash
 HERMES_VERSION="v2026.7.20"      # Update here
 OMNIROUTE_VERSION=3.8.49         # Update here
-MODELRELAY_VERSION=1.18.0
+NINE_ROUTER_VERSION=0.5.81
 OLLAMA_VERSION=0.32.5
 NODE_VERSION=24.18.0
 MNEMON_VERSION=0.1.17
@@ -374,7 +374,7 @@ git add -A && git commit -m "Update .devcontainer from upstream"
 | Service | Log Location |
 |---------|-------------|
 | Full setup | `/tmp/hermes-codespace.log` |
-| ModelRelay | `/tmp/modelrelay.log` |
+| 9Router | `/tmp/9router.log` |
 | OmniRoute | `/tmp/omniroute.log` |
 | Ollama | `/tmp/ollama.log` |
 | Hermes Gateway | `~/.hermes/logs/gateway.log` |

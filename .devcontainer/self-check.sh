@@ -105,7 +105,7 @@ if ! should_skip "services"; then
 
     # Collecting responses
     if [ "$ELAPSED" -gt "$PORT_POLL_TIMEOUT" ]; then
-      for pair in "7352:ModelRelay" "20128:OmniRoute", "9119:HermesGateway"; do
+      for pair in "7352:9Router" "20128:OmniRoute", "9119:HermesGateway"; do
         PORT="${pair%%:*}"
         NAME="${pair##*:}"
         if [ "${RESPONDED[$PORT]}" != "true" ]; then
@@ -116,7 +116,7 @@ if ! should_skip "services"; then
     fi
 
     # Testing ports
-    for pair in "7352:ModelRelay" "20128:OmniRoute" "9119:HermesGateway"; do
+    for pair in "7352:9Router" "20128:OmniRoute" "9119:HermesGateway"; do
       PORT="${pair%%:*}"
       NAME="${pair##*:}"
 
@@ -165,6 +165,8 @@ fi
 section "Models"
 
 if ! should_skip "models"; then
+
+  #OmniRouter
   models_json=$(curl -s --max-time 5 "http://localhost:20128/v1/models" 2>/dev/null || echo '{}')
   model_count=$(echo "$models_json" | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d.get('data',[])))" 2>/dev/null || echo "0")
   # Try to get the default combo name from Hermes config
@@ -178,9 +180,26 @@ if ! should_skip "models"; then
     _warn "OmniRoute" "no models returned from /v1/models (may still be starting)"
     json_add "models" "warn" "no models returned (may still be booting)" "{\"count\":0}"
   fi
+
+  # 9Router
+  models_json=$(curl -s --max-time 5 "http://localhost:7352/v1/models" 2>/dev/null || echo '{}')
+  model_count=$(echo "$models_json" | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d.get('data',[])))" 2>/dev/null || echo "0")
+  # Try to get the default combo name from Hermes config
+  default_model=$(grep -A1 '^model:' "$HERMES_CONFIG" 2>/dev/null | grep 'default' | head -1 | sed 's/.*default: *//' || echo "unknown")
+  default_model="${default_model:-unknown}"
+
+  if [ "$model_count" -gt 0 ] 2>/dev/null; then
+    _ok "9Router" "${model_count} models available (default: ${default_model})"
+    json_add "models" "ok" "${model_count} models, default combo: ${default_model}" "{\"count\":${model_count},\"default\":\"${default_model}\"}"
+  else
+    _warn "9Router" "no models returned from /v1/models (may still be starting)"
+    json_add "models" "warn" "no models returned (may still be booting)" "{\"count\":0}"
+  fi
+
 else
   echo "   (skipped)"
 fi
+
 
 # ── 3. Mnemon ────────────────────────────────────────────────────────────────
 section "Mnemon"

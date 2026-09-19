@@ -118,7 +118,7 @@ jobs:
           mkdir -p /tmp/failure-logs
 
           # Service logs (written to /tmp by start scripts)
-          cp /tmp/modelrelay.log   /tmp/failure-logs/ 2>/dev/null || true
+          cp /tmp/9router.log      /tmp/failure-logs/ 2>/dev/null || true
           cp /tmp/omniroute.log    /tmp/failure-logs/ 2>/dev/null || true
           cp /tmp/ollama.log       /tmp/failure-logs/ 2>/dev/null || true
           cp /tmp/ollama-pull.log  /tmp/failure-logs/ 2>/dev/null || true

@@ -6,7 +6,7 @@
 [![Dev Container](https://img.shields.io/badge/devcontainer-ready-blue?logo=docker)](https://containers.dev/)
 [![Hermes Agent](https://img.shields.io/badge/Hermes%20Agent-v2026.8.31-purple?logo=github)](https://github.com/NousResearch/hermes-agent)
 [![PI Agent](https://img.shields.io/badge/PI%20Agent-v0.85.1-brown?logo=github)](https://pi.dev)
-[![ModelRelay](https://img.shields.io/badge/ModelRelay-1.22.1-green?logo=npm)](https://www.npmjs.com/package/modelrelay)
+[![9Router](https://img.shields.io/badge/9Router-0.5.81-green?logo=npm)](https://www.npmjs.com/package/9router)
 [![OmniRoute](https://img.shields.io/badge/OmniRoute-3.8.50-orange?logo=npm)](https://www.npmjs.com/package/omniroute)
 [![Ollama](https://img.shields.io/badge/Ollama-0.33.2-yellow?logo=ollama)](https://github.com/ollama/ollama)
 [![Mnemon](https://img.shields.io/badge/Mnemon-0.2.8-pink?logo=github)](https://github.com/mnemon-dev/mnemon)
@@ -26,7 +26,7 @@ Hermes-CodeSpace is a **zero-config GitHub Codespaces template** that spins up a
 | **[Hermes VS Code Extension](https://marketplace.visualstudio.com/items?itemName=JoveRina.rina-hermes-acp)** | Full IDE integration — chat, inline suggestions, terminal access | — |
 | **[Claude Code](https://github.com/anthropics/claude-code)** | Anthropic's CLI agent — preconfigured with Omniroute | — |
 | **[Cline](https://marketplace.visualstudio.com/items?itemName=saoudrizwan.claude-dev)** | VS Code coding agent — preconfigured with Omniroute | — |
-| **[ModelRelay](https://www.npmjs.com/package/modelrelay)** | OpenAI-compatible local router — benchmarks free coding models and routes to the best provider | 7352 |
+| **[9Router](https://github.com/decolua/9router)** | AI gateway with web dashboard — 40+ providers, OpenAI-compatible `/v1` API, combo builder | 7352 |
 | **[OmniRoute](https://www.npmjs.com/package/omniroute)** | OpenAI-compatible local router with MCP support — benchmarks free models and routes to the best provider | 20128 |
 | **[Mnemon](https://github.com/mnemon-dev/mnemon)** | Persistent memory layer for AI agents (no token limits) | — |
 | **[Ollama](https://ollama.com/)** | Local LLM inference server for `nomic-embed-text` to support Mnemon | 11434 |
@@ -37,7 +37,7 @@ Hermes-CodeSpace is a **zero-config GitHub Codespaces template** that spins up a
 
 | Problem | Solution |
 |---------|----------|
-| GitHub Copilot free monthly trial expires | **Free forever** — runs on free tier models via OmniRoute/ModelRelay |
+| GitHub Copilot free monthly trial expires | **Free forever** — runs on free tier models via OmniRoute/9Router |
 | Vendor lock-in | **Multi-provider routing** — auto-routes to best free model (DeepSeek, Nemotron, etc.) |
 | Context loss between sessions | **Mnemon memory** — persistent, unlimited memory across sessions |
 | Context switching between tools | **Unified IDE** — Hermes, Claude Code, and Cline all in VS Code |
@@ -80,16 +80,16 @@ The `postCreateCommand` runs once during container creation (~5–10 min):
 | 1️⃣ | Install system deps: `zsh`, `ripgrep`, `tailscale` |
 | 2️⃣ | Install **Ollama** + pull `nomic-embed-text` embedding model |
 | 3️⃣ | Install **Hermes Agent** (v2026.7.7.2) with ACP protocol |
-| 4️⃣ | Install **ModelRelay** (global npm) + start on port 7352 |
+| 4️⃣ | Install **9Router** (global npm) + start on port 7352 |
 | 5️⃣ | Install **OmniRoute** (v3.8.48) |
 | 6️⃣ | Configure **OmniRoute**: disable login, create `auto-fastest` combo with 8 free models |
-| 7️⃣ | Configure **Hermes**: `auto-fastest` model, OmniRoute provider, ModelRelay fallback, memory enabled (Mnemon), approvals off |
+| 7️⃣ | Configure **Hermes**: `auto-fastest` model, OmniRoute provider, 9Router fallback, memory enabled (Mnemon), approvals off |
 | 8️⃣ | Install **Mnemon** memory CLI + integrate with Hermes & Claude Code |
 | 9️⃣ | Install **Cline** + **Claude Code CLI** + VS Code extensions |
 | 🔟 | Pre-configure VS Code settings for Claude Code (Omniroute endpoint) |
 
 The `postStartCommand` runs on every codespace start (~30 sec):
-- Starts ModelRelay, OmniRoute, Ollama
+- Starts 9Router, OmniRoute, Ollama
 - Starts Hermes Gateway (port 9119) + Dashboard (port 9119)
 - Runs health self-check
 
@@ -101,7 +101,7 @@ After startup, check the **PORTS** panel (VS Code bottom panel) for:
 
 | Port | Service | Access |
 |------|---------|--------|
-| **7352** | ModelRelay API | `http://localhost:7352/v1` |
+| **7352** | 9Router API | `http://localhost:7352/v1` |
 | **20128** | OmniRoute API | `http://localhost:20128/v1` |
 | **9119** | Hermes Gateway + Dashboard | `http://localhost:9119` |
 | **11434** | Ollama API | `http://localhost:11434` |
@@ -125,7 +125,7 @@ hermes "refactor foo.ts"  # One-shot task
 
 ### Claude Code CLI
 ```bash
-claude                    # Interactive (uses ModelRelay @ localhost:7352)
+claude                    # Interactive (uses 9Router @ localhost:7352)
 claude -p "fix bug"       # One-shot
 ```
 
@@ -159,11 +159,11 @@ providers:
   omniroute:
     base_url: http://localhost:20128/v1
     api_key: no-key-needed
-  modelrelay:
+  9router:
     base_url: http://localhost:7352/v1
     api_key: no-key-needed
 fallback_providers:
-  provider: modelrelay
+  provider: 9router
   model: auto-fastest
 memory:
   memory_enabled: true
@@ -238,7 +238,7 @@ tail -f /tmp/hermes-codespace.log # Follow live
 
 ### Service Logs
 ```bash
-tail -f /tmp/modelrelay.log
+tail -f /tmp/9router.log
 tail -f /tmp/omniroute.log
 tail -f /tmp/ollama.log
 tail -f ~/.hermes/logs/gateway.log
@@ -288,7 +288,7 @@ rm -rf ~/.hermes ~/.mnemon ~/.omniroute ~/.ollama
 ├─────────────────────────────────────────────────────────────────┤
 │  Model Routers (OpenAI-compatible)                              │
 │  ├─ OmniRoute  :20128  → 8 free models (auto-fastest)           │
-│  ├─ ModelRelay :7352   → fallback router                        │
+│  ├─ 9Router    :7352   → fallback router                        │
 │  └─ Ollama     :11434  → local embeddings (nomic-embed-text)    │
 ├─────────────────────────────────────────────────────────────────┤
 │  Memory Layer                                                   │
@@ -346,7 +346,7 @@ MIT — see [LICENSE](LICENSE)
 Built on amazing open-source projects:
 
 - [Hermes Agent](https://github.com/NousResearch/hermes-agent) by Nous Research
-- [ModelRelay](https://github.com/gitricko/modelrelay) by rolandorojas
+- [9Router](https://github.com/decolua/9router) by decolua
 - [OmniRoute](https://github.com/gitricko/omniroute) by diegosouzapw
 - [Mnemon](https://github.com/mnemon-dev/mnemon) by mnemon-dev
 - [Ollama](https://ollama.com/) by Ollama Team
