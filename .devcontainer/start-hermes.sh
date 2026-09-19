@@ -15,7 +15,7 @@ WORKSPACE_ROOT="${WORKSPACE:-$(dirname "$SCRIPT_DIR")}"
 MISSING=()
 
 # Check service binaries
-for bin in modelrelay omniroute ollama hermes mnemon; do
+for bin in 9router omniroute ollama hermes mnemon; do
   if ! command -v "$bin" &>/dev/null; then
     MISSING+=("binary: $bin")
   fi
@@ -43,12 +43,12 @@ echo "*****   Starting Hermes Agent Services ....    *****"
 echo
 echo "    $(date)"
 
-# 1. Starting modelrelay...
-if pgrep -f modelrelay > /dev/null; then
-  echo "[$SCRIPT_NAME] modelrelay is already running, skipping"
+# 1. Starting 9router...
+if pgrep -f 9router > /dev/null; then
+  echo "[$SCRIPT_NAME] 9router is already running, skipping"
 else
-  echo "[$SCRIPT_NAME] Starting modelrelay in the background..."
-  setsid /usr/local/bin/modelrelay >> /tmp/modelrelay.log 2>&1 &
+  echo "[$SCRIPT_NAME] Starting 9router in the background..."
+  nohup /usr/local/bin/9router --host 0.0.0.0 --host 127.0.0.1 --port 7352 --no-browser --skip-update >> /tmp/9router.log 2>&1 &
 fi
 
 # 2. Starting omniroute...
